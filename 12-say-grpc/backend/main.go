@@ -20,6 +20,7 @@ import (
 	"net"
 	"os/exec"
 
+	flite "justfunc/0719-flite"
 	pb "justfunc/12-say-grpc/api"
 
 	"github.com/Sirupsen/logrus"
@@ -57,8 +58,8 @@ func (server) Say(ctx context.Context, text *pb.Text) (*pb.Speech, error) {
 	}
 
 	cmd := exec.Command("flite", "-t", text.Text, "-o", f.Name())
-	if data, err := cmd.CombinedOutput(); err != nil {
-		return nil, fmt.Errorf("flite failed: %s", data)
+	if err := flite.TextToSpeech(text.Text, f.Name); err != nil {
+		return nil, fmt.Errorf("flite failed: %v", err)
 	}
 
 	data, err := ioutil.ReadFile(f.Name())
